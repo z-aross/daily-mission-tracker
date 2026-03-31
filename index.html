@@ -245,22 +245,20 @@ function setStatus(msg,cls){
 async function cloudLoad(){
   try{
     setStatus('loading...','saving');
-    var res=await fetch(SB_URL+'/rest/v1/tracker_state?id=eq.main&select=id,data,updated_at',{
+    var res=await fetch(SB_URL+'/rest/v1/tracker_state?id=eq.main&select=data',{
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
     });
-    if(!res.ok)throw new Error('load failed');
     var rows=await res.json();
     if(rows&&rows.length&&rows[0].data&&rows[0].data.projects){
       state=rows[0].data;
-      saveLocal();
       setStatus('cloud synced','saved');
     } else {
+      setStatus('no cloud data — using local','');
       loadLocal();
-      setStatus('no cloud row yet — using local','');
     }
   }catch(e){
-    loadLocal();
     setStatus('offline — using local','error');
+    loadLocal();
   }
   render();
 }
@@ -269,7 +267,6 @@ async function cloudSave(){
   saveLocal();
   setStatus('saving...','saving');
   try{
-    var payload={id:'main',data:state,updated_at:new Date().toISOString()};
     var res=await fetch(SB_URL+'/rest/v1/tracker_state',{
       method:'POST',
       headers:{
@@ -278,18 +275,16 @@ async function cloudSave(){
         'Content-Type':'application/json',
         'Prefer':'resolution=merge-duplicates,return=minimal'
       },
-      body:JSON.stringify(payload)
+      body:JSON.stringify({id:'main',data:state,updated_at:new Date().toISOString()})
     });
-    if(res.ok){
-      setStatus('saved ✓','saved');
-    } else {
-      var errText='';
-      try{errText=await res.text();}catch(_){ }
-      console.error('Cloud save failed',res.status,errText);
-      setStatus('save failed','error');
+    if(res.ok){setStatus('saved ✓','saved');}
+    else{
+      var txt=await res.text();
+      console.error('Save error:',res.status,txt);
+      setStatus('save failed ('+res.status+')','error');
     }
   }catch(e){
-    console.error(e);
+    console.error('Save exception:',e);
     setStatus('offline — saved locally','error');
   }
 }
