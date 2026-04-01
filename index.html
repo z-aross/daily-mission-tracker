@@ -302,6 +302,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h3 id="m-habit-title">New habit</h3>
     <div class="field"><label>Name</label><input id="inp-hname" type="text" placeholder="e.g. Meditate"></div>
     <div class="field">
+      <label>Icon image URL (optional)</label>
+      <input id="inp-himg" type="text" placeholder="https://... (square, 60x60px min)">
+      <img id="himg-preview" class="img-preview" alt="icon preview">
+    </div>
+    <div class="field">
       <label>Background image URL (optional)</label>
       <input id="inp-hbg" type="text" placeholder="https://...">
       <img id="hbg-preview" class="img-preview" alt="preview">
@@ -607,8 +612,8 @@ function calcStreak(h){
   for(var i=0;i<365;i++){
     var d=new Date(today);d.setDate(d.getDate()-i);
     var k='y'+d.getFullYear()+'m'+d.getMonth()+'d'+d.getDate();
-    if(h.days[k])streak++;
-    else if(i>0)break;
+    if(h.days[k]){streak++;}
+    else{if(i===0){continue;}break;}
   }
   return streak;
 }
@@ -724,19 +729,32 @@ function renderHabits(){
   var wk=weekKeys(),dl=['M','T','W','T','F','S','S'],html='';
   state.habits.forEach(function(h){
     var streak=calcStreak(h);
+    var doneCnt=wk.filter(function(k){return h.days[k];}).length;
+    var hpct=Math.round(doneCnt/7*100);
+    var r=16,circ=2*Math.PI*r;
+    var dash=(circ*hpct/100).toFixed(1);
+    var gap=(circ*(1-hpct/100)).toFixed(1);
+    var rc=streak>=7?'#EF9F27':streak>=3?'#7aff5a':'#7F77DD';
     html+='<div class="habit-card">';
-    if(h.bg)html+='<div class="habit-bg" style="background-image:url(\''+esc(h.bg)+'\')"></div>';
-    html+='<div class="habit-inner"><div class="habit-top">'
-      +'<div class="habit-name">'+esc(h.name)+'</div>'
+    if(h.bg)html+='<div class="habit-bg" style="background-image:url(''+esc(h.bg)+'')"></div>';
+    html+='<div class="habit-inner"><div class="habit-top" style="margin-bottom:8px">'
       +'<div style="display:flex;align-items:center;gap:6px">'
-      +(streak>0?'<div class="habit-streak">'+streak+'&#128293;</div>':'')
+      +(h.iconImg?'<img src="'+esc(h.iconImg)+'" style="width:22px;height:22px;border-radius:5px;object-fit:cover">':'')
+      +'<div class="habit-name">'+esc(h.name)+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:4px">'
+      +(streak>0?'<div class="habit-streak'+(streak>=3?' streak-fire':'')+'">'+streak+' &#128293;</div>':'')
+      +'<svg width="36" height="36" viewBox="0 0 38 38">'
+      +'<circle cx="19" cy="19" r="'+r+'" fill="none" stroke="#2a2a2a" stroke-width="3"/>'
+      +'<circle cx="19" cy="19" r="'+r+'" fill="none" stroke="'+rc+'" stroke-width="3"'
+      +' stroke-dasharray="'+dash+' '+gap+'" stroke-linecap="round" transform="rotate(-90 19 19)"/>'
+      +'<text x="19" y="23" text-anchor="middle" font-size="9" fill="'+rc+'" font-weight="500">'+hpct+'%</text>'
+      +'</svg>'
       +'<div class="habit-actions">'
-      +'<button class="hact-btn" onclick="editHabit(\''+h.id+'\')" title="Edit">&#9998;</button>'
-      +'<button class="hact-btn" onclick="delHabit(\''+h.id+'\')" title="Delete" style="color:#e24b4a">&#215;</button>'
-      +'</div></div></div>'
-      +'<div class="habit-days">';
+      +'<button class="hact-btn" onclick="editHabit(''+h.id+'')" title="Edit">&#9998;</button>'
+      +'<button class="hact-btn" onclick="delHabit(''+h.id+'')" title="Delete" style="color:#e24b4a">&#215;</button>'
+      +'</div></div></div><div class="habit-days">';
     wk.forEach(function(k,i){
-      html+='<div class="hday'+(h.days[k]?' don':'')+'" onclick="tickHabit(\''+h.id+'\',\''+k+'\')">'+dl[i]+'</div>';
+      html+='<div class="hday'+(h.days[k]?' don':'')+'" onclick="tickHabit(''+h.id+'',''+k+'')">'+dl[i]+'</div>';
     });
     html+='</div></div></div>';
   });
@@ -964,7 +982,7 @@ function confirmTaskDate(){
 function showAddHabit(){
   editHabitId=null;
   document.getElementById('m-habit-title').textContent='New habit';
-  document.getElementById('inp-hname').value='';document.getElementById('inp-hbg').value='';
+  document.getElementById('inp-hname').value='';document.getElementById('inp-hbg').value='';document.getElementById('inp-himg').value='';document.getElementById('himg-preview').classList.remove('show');
   document.getElementById('hbg-preview').classList.remove('show');
   document.getElementById('m-habit').classList.add('open');
   setTimeout(function(){document.getElementById('inp-hname').focus();},100);
@@ -972,10 +990,14 @@ function showAddHabit(){
 function editHabit(hid){
   editHabitId=hid;var h=state.habits.find(function(x){return x.id===hid;});if(!h)return;
   document.getElementById('m-habit-title').textContent='Edit habit';
-  document.getElementById('inp-hname').value=h.name;document.getElementById('inp-hbg').value=h.bg||'';
+  document.getElementById('inp-hname').value=h.name;document.getElementById('inp-hbg').value=h.bg||'';document.getElementById('inp-himg').value=h.iconImg||'';var hip=document.getElementById('himg-preview');if(h.iconImg){hip.src=h.iconImg;hip.classList.add('show');}else{hip.classList.remove('show');}
   var prev=document.getElementById('hbg-preview');if(h.bg){prev.src=h.bg;prev.classList.add('show');}else{prev.classList.remove('show');}
   document.getElementById('m-habit').classList.add('open');
 }
+document.getElementById('inp-himg').addEventListener('input',function(){
+  var val=this.value.trim(),prev=document.getElementById('himg-preview');
+  if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
+});
 document.getElementById('inp-hbg').addEventListener('input',function(){
   var val=this.value.trim(),prev=document.getElementById('hbg-preview');
   if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
@@ -983,8 +1005,9 @@ document.getElementById('inp-hbg').addEventListener('input',function(){
 function confirmHabit(){
   var name=document.getElementById('inp-hname').value.trim();if(!name){document.getElementById('inp-hname').focus();return;}
   var bg=document.getElementById('inp-hbg').value.trim();
-  if(editHabitId){var h=state.habits.find(function(x){return x.id===editHabitId;});if(h){h.name=name;h.bg=bg;}}
-  else{state.habits.push({id:'hb'+Date.now(),name:name,bg:bg,days:{}});}
+  var iconImg=document.getElementById('inp-himg').value.trim();
+  if(editHabitId){var h=state.habits.find(function(x){return x.id===editHabitId;});if(h){h.name=name;h.bg=bg;h.iconImg=iconImg;}}
+  else{state.habits.push({id:'hb'+Date.now(),name:name,bg:bg,iconImg:iconImg,days:{}});}
   closeAll();scheduleSave();render();
 }
 
