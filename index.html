@@ -119,6 +119,74 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .color-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 .color-swatch{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent}
 .color-swatch.sel{border-color:#fff}
+
+/* upgraded visuals */
+.ring-wrap{display:flex;justify-content:center;gap:24px;margin-bottom:14px;flex-wrap:wrap}
+.ring-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.ring-label{font-size:10px;color:#555;letter-spacing:1px;text-transform:uppercase}
+.proj-icon-img,.habit-icon-img{width:30px;height:30px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.proj-icon-wrap,.habit-icon-wrap{width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.proj-mini-ring,.habit-mini-ring{flex-shrink:0;filter:drop-shadow(0 0 8px rgba(122,255,90,.12))}
+.habit-title-row{display:flex;align-items:center;gap:8px;min-width:0}
+.habit-name-wrap{display:flex;flex-direction:column;gap:2px;min-width:0}
+.habit-stats{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.habit-chip{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid #2c2c2c;background:#141414;color:#888}
+.habit-chip.best{color:#ef9f27;border-color:#5b4420;background:#22180d}
+.habit-chip.streak{color:#7aff5a;border-color:#274829;background:#132014}
+.habit-ring-num{font-size:9px;font-weight:700}
+.habit-icon-label{font-size:10px;color:#444}
+.task-link-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.task-link-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 10px;border-radius:999px;
+  border:1px solid #2e3440;
+  background:linear-gradient(180deg,#1b1f26 0%,#14171c 100%);
+  color:#dfe8ff;text-decoration:none;font-size:11px;font-weight:600;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 4px 16px rgba(0,0,0,.25);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.task-link-pill:hover{
+  transform:translateY(-1px);
+  border-color:#59627a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(127,119,221,.18);
+}
+.task-link-pill .ico{font-size:12px;opacity:.95}
+.task-link-pill .ext{font-size:10px;opacity:.6}
+.complete-burst{
+  position:fixed;pointer-events:none;z-index:9999;border-radius:50%;
+  width:18px;height:18px;opacity:.9;animation:burstOut .9s ease forwards;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), rgba(122,255,90,.55) 35%, rgba(122,255,90,0) 70%);
+}
+.float-win{
+  position:fixed;pointer-events:none;z-index:9999;
+  color:#7aff5a;font-weight:700;font-size:14px;letter-spacing:.4px;
+  text-shadow:0 0 18px rgba(122,255,90,.35);
+  animation:floatWin 1.1s ease forwards;
+}
+.task-item.complete-flash{animation:taskPulse .75s ease}
+.project-card.project-win{animation:projectGlow 1.2s ease}
+.ring-svg circle,.ring-svg text{transition:all .5s ease}
+@keyframes burstOut{
+  0%{transform:scale(.3);opacity:1}
+  60%{transform:scale(4);opacity:.6}
+  100%{transform:scale(6);opacity:0}
+}
+@keyframes floatWin{
+  0%{transform:translateY(0) scale(.9);opacity:0}
+  18%{opacity:1}
+  100%{transform:translateY(-40px) scale(1.06);opacity:0}
+}
+@keyframes taskPulse{
+  0%{box-shadow:0 0 0 rgba(122,255,90,0);background:rgba(122,255,90,0)}
+  30%{box-shadow:0 0 0 1px rgba(122,255,90,.5), 0 0 28px rgba(122,255,90,.14);background:rgba(122,255,90,.07)}
+  100%{box-shadow:0 0 0 rgba(122,255,90,0);background:transparent}
+}
+@keyframes projectGlow{
+  0%{box-shadow:0 0 0 rgba(122,255,90,0)}
+  35%{box-shadow:0 0 0 1px rgba(122,255,90,.4), 0 0 40px rgba(122,255,90,.18)}
+  100%{box-shadow:0 0 0 rgba(122,255,90,0)}
+}
+
 </style>
 </head>
 <body>
@@ -134,6 +202,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="quote-text" id="quote-text"></div>
 <div class="quote-tap">tap for next</div>
 </div>
+
+
+<div class="ring-wrap" id="rings-wrap">
+  <div class="ring-item">
+    <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+      <circle id="ring-o" cx="40" cy="40" r="34" fill="none" stroke="#7aff5a" stroke-width="6" stroke-dasharray="0 214" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+      <text id="ring-o-txt" x="40" y="45" text-anchor="middle" font-size="14" fill="#7aff5a" font-weight="500">0%</text>
+    </svg>
+    <div class="ring-label">Roadmap</div>
+  </div>
+  <div class="ring-item">
+    <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+      <circle id="ring-t" cx="40" cy="40" r="34" fill="none" stroke="#7F77DD" stroke-width="6" stroke-dasharray="0 214" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+      <text id="ring-t-txt" x="40" y="45" text-anchor="middle" font-size="14" fill="#AFA9EC" font-weight="500">0/0</text>
+    </svg>
+    <div class="ring-label">Tasks</div>
+  </div>
+  <div class="ring-item">
+    <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+      <circle id="ring-h" cx="40" cy="40" r="34" fill="none" stroke="#1D9E75" stroke-width="6" stroke-dasharray="0 214" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+      <text id="ring-h-txt" x="40" y="45" text-anchor="middle" font-size="14" fill="#5DCAA5" font-weight="500">0%</text>
+    </svg>
+    <div class="ring-label">Habits</div>
+  </div>
+</div>
+
 
 <div class="overall-bars">
 <div class="bar-row">
@@ -185,6 +282,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <label>Accent colour</label>
 <div class="color-row" id="color-row"></div>
 </div>
+<div class="field"><label>Icon image URL (optional — replaces letter)</label><input id="inp-pimg" type="text" placeholder="https://... (square image)"><img id="pimg-preview" class="img-preview" alt="icon preview"></div>
 <div class="field">
 <label>Background image URL (optional)</label>
 <input id="inp-pbg" type="text" placeholder="https://...">
@@ -204,6 +302,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <h3>Task details</h3>
 <div class="field"><label>Deadline</label><input id="inp-tdate" type="date"></div>
 <div class="field"><label>Notes</label><textarea id="inp-tnotes" placeholder="Any notes..."></textarea></div>
+<div class="field"><label>Word / pill text</label><input id="inp-tlinklabel" type="text" placeholder="e.g. Badminton"></div>
+<div class="field"><label>Link URL</label><input id="inp-tlinkurl" type="url" placeholder="https://..."></div>
 <div class="modal-btns">
 <button class="btn" style="flex:1" onclick="closeAll()">Cancel</button>
 <button class="btn btn-g" style="flex:1" onclick="confirmTaskDate()">Save</button>
@@ -216,6 +316,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="modal">
 <h3 id="m-habit-title">New habit</h3>
 <div class="field"><label>Name</label><input id="inp-hname" type="text" placeholder="e.g. Meditate"></div>
+<div class="field"><label>Icon image URL (optional — beside name)</label><input id="inp-hicon" type="text" placeholder="https://... (square image)"><img id="hicon-preview" class="img-preview" alt="icon preview"></div>
 <div class="field">
 <label>Background image URL (optional)</label>
 <input id="inp-hbg" type="text" placeholder="https://...">
@@ -231,7 +332,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 /* ── SUPABASE CONFIG ── */
 var SB_URL='https://nrrelxgadtczdegztdc.supabase.co';
-var SB_URL='https://nrrelxgadtdczdegztdc.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycmVseGdhZHRkY3pkZWd6dGRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4OTA4MDYsImV4cCI6MjA5MDQ2NjgwNn0.VW6jMHuMGofOVOxrCUxvfbYQI7TS5kQlIwWx3VNTEZA';
 
 /* ── CLOUD SAVE ── */
@@ -261,6 +361,7 @@ if(!res.ok){throw new Error('HTTP '+res.status);}
 var rows=await res.json();
 if(rows&&rows.length&&rows[0].data&&rows[0].data.projects){
 state=rows[0].data;
+ensureStateShape();
 setStatus('cloud synced ✓','saved');
 } else {
 loadLocal();
@@ -303,7 +404,7 @@ saveTimer=setTimeout(cloudSave,1500);
 }
 
 function saveLocal(){try{localStorage.setItem('dmv5',JSON.stringify(state));}catch(e){}}
-function loadLocal(){try{var s=localStorage.getItem('dmv5');if(s&&JSON.parse(s).projects)state=JSON.parse(s);}catch(e){}}
+function loadLocal(){try{var s=localStorage.getItem('dmv5');if(s&&JSON.parse(s).projects)state=JSON.parse(s);ensureStateShape();}catch(e){}}
 
 /* ── QUOTES ── */
 var QUOTES=[
@@ -417,18 +518,62 @@ if(!d)return '';
 return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 }
 
+function ensureStateShape(){
+  state.projects=(state.projects||[]).map(function(p){
+    p.iconImg=p.iconImg||'';
+    p.tasks=(p.tasks||[]).map(function(t){
+      t.notes=t.notes||'';
+      t.subtasks=t.subtasks||[];
+      t.open=!!t.open;
+      t.link=t.link||{label:'',url:''};
+      return t;
+    });
+    return p;
+  });
+  state.habits=(state.habits||[]).map(function(h){
+    h.bg=h.bg||'';
+    h.iconImg=h.iconImg||'';
+    h.days=h.days||{};
+    h.bestStreak=h.bestStreak||0;
+    return h;
+  });
+}
+function habitWeekDone(h){
+  var wk=weekKeys(), done=0;
+  wk.forEach(function(k){ if(h.days[k]) done++; });
+  return done;
+}
+function ringDash(p){
+  var circ=2*Math.PI*34;
+  var dash=circ*(p/100), gap=circ-dash;
+  return dash.toFixed(1)+' '+gap.toFixed(1);
+}
+function setRing(id, txtId, pct, label){
+  var el=document.getElementById(id), tel=document.getElementById(txtId);
+  if(el) el.setAttribute('stroke-dasharray', ringDash(pct));
+  if(tel) tel.textContent=label;
+}
+
+
 function calcStreak(h){
 var today=new Date();today.setHours(0,0,0,0);
+var start=new Date(today);
+var todayKey='y'+today.getFullYear()+'m'+today.getMonth()+'d'+today.getDate();
+if(!h.days[todayKey]) start.setDate(start.getDate()-1);
 var streak=0;
 for(var i=0;i<365;i++){
-var d=new Date(today);d.setDate(d.getDate()-i);
-var k='y'+d.getFullYear()+'m'+d.getMonth()+'d'+d.getDate();
-if(h.days[k])streak++;
-else if(i>0)break;
+  var d=new Date(start);d.setDate(start.getDate()-i);
+  var k='y'+d.getFullYear()+'m'+d.getMonth()+'d'+d.getDate();
+  if(h.days[k]) streak++;
+  else break;
 }
 return streak;
 }
-
+function syncHabitBest(h){
+  var s=calcStreak(h);
+  h.bestStreak=Math.max(h.bestStreak||0,s);
+  return s;
+}
 function weekKeys(){
 var keys=[],today=new Date();today.setHours(0,0,0,0);
 var dow=today.getDay();
@@ -455,6 +600,7 @@ el.className='countdown active';
 }
 
 /* ── BARS ── */
+
 function bars(){
 var all=[];state.projects.forEach(function(p){all=all.concat(p.tasks);});
 var done=all.filter(function(t){return t.done;}).length,total=all.length;
@@ -468,19 +614,29 @@ state.habits.forEach(function(h){wk.forEach(function(k){if(h.days[k])hd++;});});
 var hp=ht?Math.round(hd/ht*100):0;
 document.getElementById('lbl-h').textContent=hp+'%';
 document.getElementById('bar-h').style.width=hp+'%';
+setRing('ring-o','ring-o-txt',op,op+'%');
+setRing('ring-t','ring-t-txt',op,done+'/'+total);
+setRing('ring-h','ring-h-txt',hp,hp+'%');
 }
 
+
 /* ── RENDER PROJECTS ── */
+
 function renderProjects(){
 var sorted=state.projects.slice().sort(function(a,b){return a.priority-b.priority;});
 var html='';
 sorted.forEach(function(p){
 var c=col(p.ci);var pc=pct(p.tasks);var dc=p.tasks.filter(function(t){return t.done;}).length;
+var projRing = '<svg class="proj-mini-ring ring-svg" width="38" height="38" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="'+c.accent+'" stroke-width="6" stroke-dasharray="'+ringDash(pc)+'" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="45" text-anchor="middle" font-size="13" fill="'+c.text+'" font-weight="700">'+pc+'</text></svg>';
+var projIcon = p.iconImg
+  ? '<img class="proj-icon-img" src="'+esc(p.iconImg)+'" alt="">'
+  : '<div class="proj-icon" style="background:'+c.bg+';color:'+c.text+'">'+esc(p.icon)+'</div>';
 html+='<div class="project-card" id="pc-'+p.id+'" ondragover="cvr(event,\''+p.id+'\')" ondrop="cdp(event,\''+p.id+'\')" ondragleave="cvl(\''+p.id+'\')">';
 if(p.bg)html+='<div class="proj-bg" style="background-image:url(\''+esc(p.bg)+'\')"></div>';
 html+='<div class="proj-inner"><div class="proj-header">'
-+'<div class="proj-icon" style="background:'+c.bg+';color:'+c.text+'">'+esc(p.icon)+'</div>'
++'<div class="proj-icon-wrap">'+projIcon+'</div>'
 +'<div class="proj-info"><div class="proj-name">'+esc(p.name)+'</div><div class="proj-count">'+dc+'/'+p.tasks.length+' done</div></div>'
++projRing
 +'<div class="proj-actions">'
 +'<button class="proj-btn" onclick="openPriModal(\''+p.id+'\')" style="border-color:'+c.accent+';color:'+c.text+'">P'+p.priority+'</button>'
 +'<button class="proj-btn" onclick="editProject(\''+p.id+'\')">&#9998;</button>'
@@ -492,6 +648,7 @@ p.tasks.forEach(function(t){
 var ds=dateStatus(t.date);
 var sd=t.subtasks?t.subtasks.filter(function(s){return s.done;}).length:0;
 var st=t.subtasks?t.subtasks.length:0;
+var linkHtml=(t.link&&t.link.url&&t.link.label)?'<div class="task-link-row"><a class="task-link-pill" href="'+esc(t.link.url)+'" target="_blank" rel="noopener"><span class="ico">&#128279;</span><span>'+esc(t.link.label)+'</span><span class="ext">&#8599;</span></a></div>':'';
 html+='<div class="task-wrap" id="tw-'+t.id+'">'
 +'<div class="task-item" id="ti-'+t.id+'" draggable="true"'
 +' ondragstart="tds(event,\''+p.id+'\',\''+t.id+'\')" ondragend="tde()" ondragover="tdo(event,\''+p.id+'\',\''+t.id+'\')" ondrop="tdp(event,\''+p.id+'\',\''+t.id+'\')">'
@@ -502,9 +659,11 @@ html+='<div class="task-wrap" id="tw-'+t.id+'">'
 +'<div class="task-meta">'
 +(t.date?'<span class="task-date-badge '+ds+'">'+fmtDate(t.date)+'</span>':'')
 +(st>0?'<span class="subtask-toggle" onclick="toggleSubs(\''+t.id+'\')">'+sd+'/'+st+' subtasks</span>':'')
-+'</div></div>'
++'</div>'
++linkHtml
++'</div>'
 +'<div class="task-edit-btns">'
-+'<button class="te-btn" onclick="openTaskDate(\''+p.id+'\',\''+t.id+'\')" title="Date">&#128197;</button>'
++'<button class="te-btn" onclick="openTaskDate(\''+p.id+'\',\''+t.id+'\')" title="Details">&#128197;</button>'
 +'<button class="te-btn" onclick="addSubtask(\''+p.id+'\',\''+t.id+'\')" title="Subtask">&#43;</button>'
 +'<button class="te-btn" onclick="delTask(\''+p.id+'\',\''+t.id+'\')" title="Delete" style="color:#e24b4a">&#215;</button>'
 +'</div></div>';
@@ -527,16 +686,22 @@ document.getElementById('proj-grid').innerHTML=html;
 }
 
 /* ── RENDER HABITS ── */
+
 function renderHabits(){
 var wk=weekKeys(),dl=['M','T','W','T','F','S','S'],html='';
 state.habits.forEach(function(h){
-var streak=calcStreak(h);
+var streak=syncHabitBest(h);
+var best=h.bestStreak||0;
+var done=habitWeekDone(h);
+var pctWeek=Math.round((done/7)*100);
+var ringColor = done===7 ? '#EF9F27' : streak>=3 ? '#7aff5a' : '#7F77DD';
+var habitRing = '<svg class="habit-mini-ring ring-svg" width="38" height="38" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="'+ringColor+'" stroke-width="6" stroke-dasharray="'+ringDash(pctWeek)+'" stroke-linecap="round" transform="rotate(-90 40 40)"/><text class="habit-ring-num" x="40" y="45" text-anchor="middle" fill="'+ringColor+'">'+done+'/7</text></svg>';
+var hIcon = h.iconImg ? '<img class="habit-icon-img" src="'+esc(h.iconImg)+'" alt="">' : '<div class="proj-icon" style="background:#161b22;color:#c9d1d9">'+esc((h.name||'?')[0].toUpperCase())+'</div>';
 html+='<div class="habit-card">';
 if(h.bg)html+='<div class="habit-bg" style="background-image:url(\''+esc(h.bg)+'\')"></div>';
 html+='<div class="habit-inner"><div class="habit-top">'
-+'<div class="habit-name">'+esc(h.name)+'</div>'
-+'<div style="display:flex;align-items:center;gap:6px">'
-+(streak>0?'<div class="habit-streak">'+streak+'&#128293;</div>':'')
++'<div class="habit-title-row"><div class="habit-icon-wrap">'+hIcon+'</div><div class="habit-name-wrap"><div class="habit-name">'+esc(h.name)+'</div><div class="habit-stats">'+(streak>0?'<span class="habit-chip streak">'+streak+' &#128293;</span>':'')+'<span class="habit-chip best">Best '+best+'</span></div></div></div>'
++'<div style="display:flex;align-items:center;gap:10px">'+habitRing
 +'<div class="habit-actions">'
 +'<button class="hact-btn" onclick="editHabit(\''+h.id+'\')" title="Edit">&#9998;</button>'
 +'<button class="hact-btn" onclick="delHabit(\''+h.id+'\')" title="Delete" style="color:#e24b4a">&#215;</button>'
@@ -550,15 +715,53 @@ html+='</div></div></div>';
 document.getElementById('habit-grid').innerHTML=html;
 }
 
-function render(){countdown();showQuote();renderProjects();renderHabits();bars();}
+function render(){ensureStateShape();countdown();showQuote();renderProjects();renderHabits();bars();}
 
 /* ── TASK ACTIONS ── */
+
+function bigCelebrate(x,y,text){
+  for(var i=0;i<7;i++){
+    var b=document.createElement('div');
+    b.className='complete-burst';
+    b.style.left=(x-9)+'px';
+    b.style.top=(y-9)+'px';
+    b.style.animationDelay=(i*0.04)+'s';
+    document.body.appendChild(b);
+    setTimeout((function(el){return function(){el.remove();};})(b),1000);
+  }
+  var f=document.createElement('div');
+  f.className='float-win';
+  f.textContent=text||'Task complete';
+  f.style.left=(x-10)+'px';
+  f.style.top=(y-10)+'px';
+  document.body.appendChild(f);
+  setTimeout(function(){f.remove();},1200);
+}
 function tickTask(pid,tid){
 var p=state.projects.find(function(x){return x.id===pid;});
 var t=p&&p.tasks.find(function(x){return x.id===tid;});
-if(t)t.done=!t.done;
+if(!t)return;
+var wasDone=t.done;
+t.done=!t.done;
+if(t.done && !wasDone){
+  var row=document.getElementById('ti-'+tid);
+  if(row){
+    var r=row.getBoundingClientRect();
+    row.classList.add('complete-flash');
+    setTimeout(function(){row.classList.remove('complete-flash');},800);
+    bigCelebrate(r.left+r.width/2, r.top+r.height/2, 'Task complete');
+  }
+  if(p.tasks.length && p.tasks.every(function(x){return x.done;})){
+    var card=document.getElementById('pc-'+pid);
+    if(card){
+      card.classList.add('project-win');
+      setTimeout(function(){card.classList.remove('project-win');},1300);
+    }
+  }
+}
 scheduleSave();render();
 }
+
 function editTaskTxt(pid,tid,val){
 var p=state.projects.find(function(x){return x.id===pid;});
 var t=p&&p.tasks.find(function(x){return x.id===tid;});
@@ -574,7 +777,7 @@ function newTask(pid){
 var p=state.projects.find(function(x){return x.id===pid;});
 if(!p)return;
 var tid='t'+Date.now();
-p.tasks.push({id:tid,text:'New task',done:false,date:'',notes:'',subtasks:[],open:false});
+p.tasks.push({id:tid,text:'New task',done:false,date:'',notes:'',subtasks:[],open:false,link:{label:'',url:''}});
 scheduleSave();render();
 setTimeout(function(){var el=document.getElementById('ti-'+tid);if(el){var inp=el.querySelector('.task-txt');if(inp){inp.focus();inp.select();}}},50);
 }
@@ -615,11 +818,16 @@ scheduleSave();render();
 }
 
 /* ── HABIT ACTIONS ── */
+
 function tickHabit(hid,key){
 var h=state.habits.find(function(x){return x.id===hid;});
-if(h)h.days[key]=!h.days[key];
+if(h){
+  h.days[key]=!h.days[key];
+  syncHabitBest(h);
+}
 scheduleSave();render();
 }
+
 function delHabit(hid){
 if(!confirm('Delete this habit?'))return;
 state.habits=state.habits.filter(function(x){return x.id!==hid;});
@@ -676,8 +884,8 @@ function selectColor(i){selColor=i;buildColorRow(i);}
 function showAddProject(){
 editProjId=null;selColor=0;newProjPri=state.projects.length+1;
 document.getElementById('m-proj-title').textContent='New project';
-document.getElementById('inp-pname').value='';document.getElementById('inp-picon').value='';document.getElementById('inp-pbg').value='';
-document.getElementById('bg-preview').classList.remove('show');
+document.getElementById('inp-pname').value='';document.getElementById('inp-picon').value='';document.getElementById('inp-pimg').value='';document.getElementById('inp-pbg').value='';
+document.getElementById('pimg-preview').classList.remove('show');document.getElementById('bg-preview').classList.remove('show');
 buildColorRow(0);buildPriGrid(newProjPri,newProjPri);
 document.getElementById('m-proj').classList.add('open');
 setTimeout(function(){document.getElementById('inp-pname').focus();},100);
@@ -686,7 +894,8 @@ function editProject(pid){
 editProjId=pid;var p=state.projects.find(function(x){return x.id===pid;});if(!p)return;
 selColor=p.ci||0;newProjPri=p.priority;
 document.getElementById('m-proj-title').textContent='Edit project';
-document.getElementById('inp-pname').value=p.name;document.getElementById('inp-picon').value=p.icon;document.getElementById('inp-pbg').value=p.bg||'';
+document.getElementById('inp-pname').value=p.name;document.getElementById('inp-picon').value=p.icon;document.getElementById('inp-pimg').value=p.iconImg||'';document.getElementById('inp-pbg').value=p.bg||'';
+var pprev=document.getElementById('pimg-preview');if(p.iconImg){pprev.src=p.iconImg;pprev.classList.add('show');}else{pprev.classList.remove('show');}
 var prev=document.getElementById('bg-preview');if(p.bg){prev.src=p.bg;prev.classList.add('show');}else{prev.classList.remove('show');}
 buildColorRow(selColor);buildPriGrid(p.priority,state.projects.length);
 document.getElementById('m-proj').classList.add('open');
@@ -697,6 +906,10 @@ document.getElementById('np-pgrid').innerHTML=html;newProjPri=sel;
 }
 function pickPri(val){newProjPri=val;document.querySelectorAll('#np-pgrid .p-opt').forEach(function(el,i){el.classList.toggle('sel',i+1===val);});}
 
+document.getElementById('inp-pimg').addEventListener('input',function(){
+var val=this.value.trim(),prev=document.getElementById('pimg-preview');
+if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
+});
 document.getElementById('inp-pbg').addEventListener('input',function(){
 var val=this.value.trim(),prev=document.getElementById('bg-preview');
 if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
@@ -705,15 +918,16 @@ if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('sho
 function confirmProject(){
 var name=document.getElementById('inp-pname').value.trim();if(!name){document.getElementById('inp-pname').focus();return;}
 var icon=(document.getElementById('inp-picon').value.trim()||name[0]||'?').toUpperCase();
+var iconImg=document.getElementById('inp-pimg').value.trim();
 var bg=document.getElementById('inp-pbg').value.trim();
 if(editProjId){
 var p=state.projects.find(function(x){return x.id===editProjId;});
 if(p){var old=p.priority;if(newProjPri!==old){var swp=state.projects.find(function(x){return x.priority===newProjPri&&x.id!==editProjId;});if(swp)swp.priority=old;}
-p.name=name;p.icon=icon;p.ci=selColor;p.bg=bg;p.priority=newProjPri;}
+p.name=name;p.icon=icon;p.iconImg=iconImg;p.ci=selColor;p.bg=bg;p.priority=newProjPri;}
 } else {
 var id='proj_'+Date.now();
 state.projects.forEach(function(p){if(p.priority>=newProjPri)p.priority++;});
-state.projects.push({id:id,name:name,icon:icon,ci:selColor,bg:bg,priority:newProjPri,tasks:[]});
+state.projects.push({id:id,name:name,icon:icon,iconImg:iconImg,ci:selColor,bg:bg,priority:newProjPri,tasks:[]});
 }
 closeAll();scheduleSave();render();
 }
@@ -722,13 +936,13 @@ closeAll();scheduleSave();render();
 function openTaskDate(pid,tid){
 var p=state.projects.find(function(x){return x.id===pid;});var t=p&&p.tasks.find(function(x){return x.id===tid;});if(!t)return;
 editTaskRef={pid:pid,tid:tid};
-document.getElementById('inp-tdate').value=t.date||'';document.getElementById('inp-tnotes').value=t.notes||'';
+document.getElementById('inp-tdate').value=t.date||'';document.getElementById('inp-tnotes').value=t.notes||'';document.getElementById('inp-tlinklabel').value=(t.link&&t.link.label)||'';document.getElementById('inp-tlinkurl').value=(t.link&&t.link.url)||'';
 document.getElementById('m-taskdate').classList.add('open');
 }
 function confirmTaskDate(){
 if(!editTaskRef)return;
 var p=state.projects.find(function(x){return x.id===editTaskRef.pid;});var t=p&&p.tasks.find(function(x){return x.id===editTaskRef.tid;});
-if(t){t.date=document.getElementById('inp-tdate').value;t.notes=document.getElementById('inp-tnotes').value;}
+if(t){t.date=document.getElementById('inp-tdate').value;t.notes=document.getElementById('inp-tnotes').value;t.link={label:document.getElementById('inp-tlinklabel').value.trim(),url:document.getElementById('inp-tlinkurl').value.trim()};}
 closeAll();scheduleSave();render();
 }
 
@@ -736,27 +950,33 @@ closeAll();scheduleSave();render();
 function showAddHabit(){
 editHabitId=null;
 document.getElementById('m-habit-title').textContent='New habit';
-document.getElementById('inp-hname').value='';document.getElementById('inp-hbg').value='';
-document.getElementById('hbg-preview').classList.remove('show');
+document.getElementById('inp-hname').value='';document.getElementById('inp-hicon').value='';document.getElementById('inp-hbg').value='';
+document.getElementById('hicon-preview').classList.remove('show');document.getElementById('hbg-preview').classList.remove('show');
 document.getElementById('m-habit').classList.add('open');
 setTimeout(function(){document.getElementById('inp-hname').focus();},100);
 }
 function editHabit(hid){
 editHabitId=hid;var h=state.habits.find(function(x){return x.id===hid;});if(!h)return;
 document.getElementById('m-habit-title').textContent='Edit habit';
-document.getElementById('inp-hname').value=h.name;document.getElementById('inp-hbg').value=h.bg||'';
+document.getElementById('inp-hname').value=h.name;document.getElementById('inp-hicon').value=h.iconImg||'';document.getElementById('inp-hbg').value=h.bg||'';
+var iprev=document.getElementById('hicon-preview');if(h.iconImg){iprev.src=h.iconImg;iprev.classList.add('show');}else{iprev.classList.remove('show');}
 var prev=document.getElementById('hbg-preview');if(h.bg){prev.src=h.bg;prev.classList.add('show');}else{prev.classList.remove('show');}
 document.getElementById('m-habit').classList.add('open');
 }
+document.getElementById('inp-hicon').addEventListener('input',function(){
+var val=this.value.trim(),prev=document.getElementById('hicon-preview');
+if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
+});
 document.getElementById('inp-hbg').addEventListener('input',function(){
 var val=this.value.trim(),prev=document.getElementById('hbg-preview');
 if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
 });
 function confirmHabit(){
 var name=document.getElementById('inp-hname').value.trim();if(!name){document.getElementById('inp-hname').focus();return;}
+var iconImg=document.getElementById('inp-hicon').value.trim();
 var bg=document.getElementById('inp-hbg').value.trim();
-if(editHabitId){var h=state.habits.find(function(x){return x.id===editHabitId;});if(h){h.name=name;h.bg=bg;}}
-else{state.habits.push({id:'hb'+Date.now(),name:name,bg:bg,days:{}});}
+if(editHabitId){var h=state.habits.find(function(x){return x.id===editHabitId;});if(h){h.name=name;h.iconImg=iconImg;h.bg=bg;syncHabitBest(h);}}
+else{state.habits.push({id:'hb'+Date.now(),name:name,iconImg:iconImg,bg:bg,days:{},bestStreak:0});}
 closeAll();scheduleSave();render();
 }
 
@@ -771,11 +991,12 @@ function triggerImport(){document.getElementById('file-inp').click();}
 function handleImport(e){
 var file=e.target.files[0];if(!file)return;
 var r=new FileReader();
-r.onload=function(ev){try{state=JSON.parse(ev.target.result);scheduleSave();render();}catch(err){alert('Invalid JSON');}};
+r.onload=function(ev){try{state=JSON.parse(ev.target.result);ensureStateShape();scheduleSave();render();}catch(err){alert('Invalid JSON');}};
 r.readAsText(file);
 }
 
 /* ── BOOT ── */
+ensureStateShape();
 cloudLoad();
 </script>
 </body>
