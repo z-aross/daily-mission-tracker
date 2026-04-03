@@ -187,6 +187,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   100%{box-shadow:0 0 0 rgba(122,255,90,0)}
 }
 
+
+.uncat-wrap{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:8px}
+.uncat-card{min-height:180px}
+.uncat-split{grid-template-columns:1fr 1fr}
+@media(max-width:900px){.uncat-split{grid-template-columns:1fr}}
+
+.uncat-card .proj-actions{display:flex;gap:4px;align-items:center}
+
 </style>
 </head>
 <body>
@@ -247,6 +255,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 </div>
 
+
+
+<div class="section-header">Uncategorised to do</div>
+<div class="uncat-wrap">
+  <div class="project-card uncat-card" id="uncat-card-1">
+    <div class="proj-inner">
+      <div class="proj-header">
+        <div class="proj-icon-wrap" id="uncat-icon-wrap-1"></div>
+        <div class="proj-info"><div class="proj-name" id="uncat-name-1">Uncategorised to do</div><div class="proj-count" id="uncat-count-1">0/0 done</div></div>
+        <svg class="proj-mini-ring ring-svg" width="38" height="38" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+          <circle id="uncat-ring-1" cx="40" cy="40" r="34" fill="none" stroke="#AFA9EC" stroke-width="6" stroke-dasharray="0 214" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+          <text id="uncat-ring-1-txt" x="40" y="45" text-anchor="middle" font-size="13" fill="#AFA9EC" font-weight="700">0</text>
+        </svg>
+        <div class="proj-actions">
+          <button class="proj-btn" onclick="editUncatBox('primary')">&#9998;</button>
+        </div>
+      </div>
+      <div class="proj-prog"><div class="pbt"><div class="pbf" id="uncat-bar-1" style="width:0%;background:#7F77DD"></div></div><div class="pbp" id="uncat-pct-1">0%</div></div>
+      <div class="task-list" id="uncat-list-1"></div>
+      <button class="add-task-btn" onclick="newUncatTask()">+ add task</button>
+    </div>
+  </div>
+  <div class="project-card uncat-card" id="uncat-card-2" style="display:none">
+    <div class="proj-inner">
+      <div class="proj-header">
+        <div class="proj-icon-wrap" id="uncat-icon-wrap-2"></div>
+        <div class="proj-info"><div class="proj-name" id="uncat-name-2">Overflow to do</div><div class="proj-count" id="uncat-count-2">0/0 done</div></div>
+        <svg class="proj-mini-ring ring-svg" width="38" height="38" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+          <circle id="uncat-ring-2" cx="40" cy="40" r="34" fill="none" stroke="#AFA9EC" stroke-width="6" stroke-dasharray="0 214" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+          <text id="uncat-ring-2-txt" x="40" y="45" text-anchor="middle" font-size="13" fill="#AFA9EC" font-weight="700">0</text>
+        </svg>
+        <div class="proj-actions">
+          <button class="proj-btn" onclick="editUncatBox('overflow')">&#9998;</button>
+        </div>
+      </div>
+      <div class="proj-prog"><div class="pbt"><div class="pbf" id="uncat-bar-2" style="width:0%;background:#7F77DD"></div></div><div class="pbp" id="uncat-pct-2">0%</div></div>
+      <div class="task-list" id="uncat-list-2"></div>
+      <button class="add-task-btn" onclick="newUncatTask()">+ add task</button>
+    </div>
+  </div>
+</div>
 <div class="section-header">Projects</div>
 <div class="projects-grid" id="proj-grid"></div>
 
@@ -261,6 +312,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="btn-row">
 <button class="btn btn-p" onclick="showAddProject()">+ Add project</button>
 <button class="btn" onclick="showAddHabit()">+ Add habit</button>
+</div>
+
+
+<!-- Add/Edit uncategorised box modal -->
+<div class="overlay" id="m-uncatbox">
+  <div class="modal">
+    <h3 id="m-uncatbox-title">Edit uncategorised box</h3>
+    <div class="field"><label>Name</label><input id="inp-uname" type="text" placeholder="e.g. Uncategorised to do"></div>
+    <div class="field"><label>Icon (1-2 chars)</label><input id="inp-uicon" type="text" maxlength="2" placeholder="e.g. U"></div>
+    <div class="field">
+      <label>Icon image URL (optional — replaces letter)</label>
+      <input id="inp-uimg" type="text" placeholder="https://... (square image)">
+      <img id="uimg-preview" class="img-preview" alt="icon preview">
+    </div>
+    <div class="field">
+      <label>Background image URL (optional)</label>
+      <input id="inp-ubg" type="text" placeholder="https://...">
+      <img id="ubg-preview" class="img-preview" alt="preview">
+    </div>
+    <div class="modal-btns">
+      <button class="btn" style="flex:1" onclick="closeAll()">Cancel</button>
+      <button class="btn btn-g" style="flex:1" onclick="confirmUncatBox()">Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- Priority modal -->
@@ -331,7 +406,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script>
 /* ── SUPABASE CONFIG ── */
-var SB_URL='https://nrrelxgadtdczdegztdc.supabase.co';
+var SB_URL='https://nrrelxgadtczdegztdc.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycmVseGdhZHRkY3pkZWd6dGRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4OTA4MDYsImV4cCI6MjA5MDQ2NjgwNn0.VW6jMHuMGofOVOxrCUxvfbYQI7TS5kQlIwWx3VNTEZA';
 
 /* ── CLOUD SAVE ── */
@@ -487,6 +562,11 @@ projects:[
 {id:'w3',text:'Set savings target for 60 days',done:false,date:'',notes:'',subtasks:[],open:false}
 ]}
 ],
+uncategorized:[],
+uncatBoxes:{
+  primary:{name:'Uncategorised to do',icon:'U',iconImg:'',bg:''},
+  overflow:{name:'Overflow to do',icon:'U2',iconImg:'',bg:''}
+},
 habits:[
 {id:'hb1',name:'Skincare',bg:'',days:{}},
 {id:'hb2',name:'Calories tracked',bg:'',days:{}},
@@ -498,7 +578,7 @@ habits:[
 };
 
 /* ── HELPERS ── */
-var dragSrc=null,editProjId=null,editHabitId=null,editTaskRef=null,newProjPri=1,selColor=0;
+var dragSrc=null,editProjId=null,editHabitId=null,editTaskRef=null,newProjPri=1,selColor=0,editUncatBoxKey=null;
 
 function col(ci){return COLORS[(ci||0)%COLORS.length];}
 function pct(tasks){if(!tasks||!tasks.length)return 0;return Math.round(tasks.filter(function(t){return t.done;}).length/tasks.length*100);}
@@ -519,6 +599,20 @@ return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'
 }
 
 function ensureStateShape(){
+  state.uncatBoxes=state.uncatBoxes||{};
+  state.uncatBoxes.primary=state.uncatBoxes.primary||{name:'Uncategorised to do',icon:'U',iconImg:'',bg:''};
+  state.uncatBoxes.overflow=state.uncatBoxes.overflow||{name:'Overflow to do',icon:'U2',iconImg:'',bg:''};
+  state.uncategorized=(state.uncategorized||[]).map(function(t){
+    t.id=t.id||('u'+Date.now()+Math.random());
+    t.text=t.text||'New task';
+    t.done=!!t.done;
+    t.date=t.date||'';
+    t.notes=t.notes||'';
+    t.subtasks=t.subtasks||[];
+    t.open=!!t.open;
+    t.link=t.link||{label:'',url:''};
+    return t;
+  });
   state.projects=(state.projects||[]).map(function(p){
     p.iconImg=p.iconImg||'';
     p.tasks=(p.tasks||[]).map(function(t){
@@ -620,6 +714,92 @@ setRing('ring-h','ring-h-txt',hp,hp+'%');
 }
 
 
+
+
+function editUncatBox(key){
+  editUncatBoxKey=key;
+  var cfg=state.uncatBoxes[key]||{};
+  document.getElementById('m-uncatbox-title').textContent='Edit '+(key==='primary'?'uncategorised':'overflow')+' box';
+  document.getElementById('inp-uname').value=cfg.name||'';
+  document.getElementById('inp-uicon').value=cfg.icon||'';
+  document.getElementById('inp-uimg').value=cfg.iconImg||'';
+  document.getElementById('inp-ubg').value=cfg.bg||'';
+  var p1=document.getElementById('uimg-preview'); if(cfg.iconImg){p1.src=cfg.iconImg;p1.classList.add('show');} else {p1.classList.remove('show');}
+  var p2=document.getElementById('ubg-preview'); if(cfg.bg){p2.src=cfg.bg;p2.classList.add('show');} else {p2.classList.remove('show');}
+  document.getElementById('m-uncatbox').classList.add('open');
+}
+function confirmUncatBox(){
+  if(!editUncatBoxKey) return;
+  state.uncatBoxes[editUncatBoxKey]={
+    name:document.getElementById('inp-uname').value.trim()|| (editUncatBoxKey==='primary'?'Uncategorised to do':'Overflow to do'),
+    icon:(document.getElementById('inp-uicon').value.trim()|| (editUncatBoxKey==='primary'?'U':'U2')).toUpperCase(),
+    iconImg:document.getElementById('inp-uimg').value.trim(),
+    bg:document.getElementById('inp-ubg').value.trim()
+  };
+  closeAll(); scheduleSave(); render();
+}
+
+function uncatSplit(){ return (state.uncategorized||[]).length>8; }
+function uncatGroups(){
+  var arr=state.uncategorized||[];
+  if(!uncatSplit()) return [arr, []];
+  var mid=Math.ceil(arr.length/2);
+  return [arr.slice(0,mid), arr.slice(mid)];
+}
+function renderUncatTask(t){
+  var ds=dateStatus(t.date), sd=t.subtasks?t.subtasks.filter(function(s){return s.done;}).length:0, st=t.subtasks?t.subtasks.length:0;
+  var linkHtml=(t.link&&t.link.url&&t.link.label)?'<div class="task-link-row"><a class="task-link-pill" href="'+esc(t.link.url)+'" target="_blank" rel="noopener"><span class="ico">&#128279;</span><span>'+esc(t.link.label)+'</span><span class="ext">&#8599;</span></a></div>':'';
+  var html='<div class="task-wrap" id="tw-'+t.id+'"><div class="task-item" id="ti-'+t.id+'" draggable="true" ondragstart="utds(event,\''+t.id+'\')" ondragend="tde()" ondragover="utdo(event,\''+t.id+'\')" ondrop="utdp(event,\''+t.id+'\')"><div class="drag-handle">&#8942;</div><div class="cb'+(t.done?' chk':'')+'" onclick="tickUncatTask(\''+t.id+'\')"></div><div class="task-body"><input class="task-txt'+(t.done?' dn':'')+'" value="'+esc(t.text)+'" onchange="editUncatTaskTxt(\''+t.id+'\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"><div class="task-meta">'+(t.date?'<span class="task-date-badge '+ds+'">'+fmtDate(t.date)+'</span>':'')+(st>0?'<span class="subtask-toggle" onclick="toggleUncatSubs(\''+t.id+'\')">'+sd+'/'+st+' subtasks</span>':'')+'</div>'+linkHtml+'</div><div class="task-edit-btns"><button class="te-btn" onclick="openUncatTaskDate(\''+t.id+'\')" title="Details">&#128197;</button><button class="te-btn" onclick="addUncatSubtask(\''+t.id+'\')" title="Subtask">&#43;</button><button class="te-btn" onclick="delUncatTask(\''+t.id+'\')" title="Delete" style="color:#e24b4a">&#215;</button></div></div>';
+  if(t.subtasks&&t.subtasks.length&&t.open){
+    html+='<div class="subtasks">';
+    t.subtasks.forEach(function(s){
+      html+='<div class="subtask-item"><div class="scb'+(s.done?' chk':'')+'" onclick="tickUncatSub(\''+t.id+'\',\''+s.id+'\')"></div><input class="stxt'+(s.done?' dn':'')+'" value="'+esc(s.text)+'" onchange="editUncatSub(\''+t.id+'\',\''+s.id+'\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"><button class="sdel" onclick="delUncatSub(\''+t.id+'\',\''+s.id+'\')">&#215;</button></div>';
+    });
+    html+='<button class="add-sub-btn" onclick="addUncatSubtask(\''+t.id+'\')">+ subtask</button></div>';
+  }
+  return html+'</div>';
+}
+function renderUncatBoxUI(n,key){
+  var cfg=state.uncatBoxes[key]||{};
+  var wrap=document.getElementById('uncat-icon-wrap-'+n);
+  var nameEl=document.getElementById('uncat-name-'+n);
+  var card=document.getElementById('uncat-card-'+n);
+  if(nameEl) nameEl.textContent=cfg.name||'Uncategorised to do';
+  if(wrap){
+    wrap.innerHTML = cfg.iconImg
+      ? '<img class="proj-icon-img" src="'+esc(cfg.iconImg)+'" alt="">'
+      : '<div class="proj-icon" style="background:#1e1a2e;color:#AFA9EC">'+esc(cfg.icon||'U')+'</div>';
+  }
+  if(card){
+    var bg = cfg.bg||'';
+    var old = card.querySelector('.proj-bg');
+    if(old) old.remove();
+    if(bg){
+      var div=document.createElement('div');
+      div.className='proj-bg';
+      div.style.backgroundImage='url("'+bg.replace(/"/g,'&quot;')+'")';
+      card.insertBefore(div, card.firstChild);
+    }
+  }
+}
+function renderUncategorized(){
+  var wrap=document.querySelector('.uncat-wrap'); if(wrap) wrap.classList.toggle('uncat-split', uncatSplit());
+  var groups=uncatGroups();
+  for(var n=1;n<=2;n++){
+    var tasks=groups[n-1], card=document.getElementById('uncat-card-'+n), list=document.getElementById('uncat-list-'+n);
+    if(!card||!list) continue;
+    if(n===2 && !tasks.length){ card.style.display='none'; continue; }
+    card.style.display='block';
+    renderUncatBoxUI(n, n===1?'primary':'overflow');
+    var done=tasks.filter(function(t){return t.done;}).length, pct=tasks.length?Math.round(done/tasks.length*100):0;
+    document.getElementById('uncat-count-'+n).textContent=done+'/'+tasks.length+' done';
+    document.getElementById('uncat-bar-'+n).style.width=pct+'%';
+    document.getElementById('uncat-pct-'+n).textContent=pct+'%';
+    setRing('uncat-ring-'+n,'uncat-ring-'+n+'-txt',pct,pct);
+    list.innerHTML=tasks.map(renderUncatTask).join('');
+  }
+}
+
 /* ── RENDER PROJECTS ── */
 
 function renderProjects(){
@@ -715,7 +895,25 @@ html+='</div></div></div>';
 document.getElementById('habit-grid').innerHTML=html;
 }
 
-function render(){ensureStateShape();countdown();showQuote();renderProjects();renderHabits();bars();}
+function render(){ensureStateShape();countdown();showQuote();renderUncategorized();renderProjects();renderHabits();bars();}
+
+
+/* ── UNCAT TASK ACTIONS ── */
+var uncatDragSrc=null;
+function getUncatTask(tid){ return (state.uncategorized||[]).find(function(x){return x.id===tid;}); }
+function newUncatTask(){ state.uncategorized.push({id:'u'+Date.now(),text:'New task',done:false,date:'',notes:'',subtasks:[],open:false,link:{label:'',url:''}}); scheduleSave(); render(); }
+function tickUncatTask(tid){ var t=getUncatTask(tid); if(!t) return; var was=t.done; t.done=!t.done; if(t.done && !was){ var row=document.getElementById('ti-'+tid); if(row){ var r=row.getBoundingClientRect(); row.classList.add('complete-flash'); setTimeout(function(){row.classList.remove('complete-flash');},800); bigCelebrate(r.left+r.width/2,r.top+r.height/2,'Task complete'); } } scheduleSave(); render(); }
+function editUncatTaskTxt(tid,val){ var t=getUncatTask(tid); if(t&&val.trim()) t.text=val.trim(); scheduleSave(); }
+function delUncatTask(tid){ state.uncategorized=(state.uncategorized||[]).filter(function(x){return x.id!==tid;}); scheduleSave(); render(); }
+function toggleUncatSubs(tid){ var t=getUncatTask(tid); if(t) t.open=!t.open; scheduleSave(); render(); }
+function addUncatSubtask(tid){ var t=getUncatTask(tid); if(!t) return; t.subtasks=t.subtasks||[]; t.subtasks.push({id:'s'+Date.now(),text:'New subtask',done:false}); t.open=true; scheduleSave(); render(); }
+function tickUncatSub(tid,sid){ var t=getUncatTask(tid), s=t&&t.subtasks.find(function(x){return x.id===sid;}); if(s) s.done=!s.done; scheduleSave(); render(); }
+function editUncatSub(tid,sid,val){ var t=getUncatTask(tid), s=t&&t.subtasks.find(function(x){return x.id===sid;}); if(s&&val.trim()) s.text=val.trim(); scheduleSave(); }
+function delUncatSub(tid,sid){ var t=getUncatTask(tid); if(t&&t.subtasks) t.subtasks=t.subtasks.filter(function(x){return x.id!==sid;}); scheduleSave(); render(); }
+function openUncatTaskDate(tid){ var t=getUncatTask(tid); if(!t) return; editTaskRef={pid:'__uncat__',tid:tid}; document.getElementById('inp-tdate').value=t.date||''; document.getElementById('inp-tnotes').value=t.notes||''; document.getElementById('inp-tlinklabel').value=(t.link&&t.link.label)||''; document.getElementById('inp-tlinkurl').value=(t.link&&t.link.url)||''; document.getElementById('m-taskdate').classList.add('open'); }
+function utds(e,tid){ uncatDragSrc={tid:tid}; e.dataTransfer.effectAllowed='move'; setTimeout(function(){ var el=document.getElementById('ti-'+tid); if(el) el.classList.add('isd'); },0); }
+function utdo(e,tid){ e.preventDefault(); e.stopPropagation(); if(!uncatDragSrc||uncatDragSrc.tid===tid) return; document.querySelectorAll('.task-item').forEach(function(el){el.classList.remove('dto');}); var el=document.getElementById('ti-'+tid); if(el) el.classList.add('dto'); }
+function utdp(e,tid){ e.preventDefault(); e.stopPropagation(); if(!uncatDragSrc||uncatDragSrc.tid===tid) return; var arr=state.uncategorized||[]; var si=arr.findIndex(function(x){return x.id===uncatDragSrc.tid;}), di=arr.findIndex(function(x){return x.id===tid;}); if(si<0||di<0) return; var task=arr.splice(si,1)[0]; arr.splice(di,0,task); uncatDragSrc=null; scheduleSave(); render(); }
 
 /* ── TASK ACTIONS ── */
 
@@ -942,7 +1140,7 @@ document.getElementById('m-taskdate').classList.add('open');
 function confirmTaskDate(){
 if(!editTaskRef)return;
 var p=state.projects.find(function(x){return x.id===editTaskRef.pid;});var t=p&&p.tasks.find(function(x){return x.id===editTaskRef.tid;});
-if(t){t.date=document.getElementById('inp-tdate').value;t.notes=document.getElementById('inp-tnotes').value;t.link={label:document.getElementById('inp-tlinklabel').value.trim(),url:document.getElementById('inp-tlinkurl').value.trim()};}
+if(editTaskRef.pid==='__uncat__'){var ut=getUncatTask(editTaskRef.tid);if(ut){ut.date=document.getElementById('inp-tdate').value;ut.notes=document.getElementById('inp-tnotes').value;ut.link={label:document.getElementById('inp-tlinklabel').value.trim(),url:document.getElementById('inp-tlinkurl').value.trim()};}} else if(t){t.date=document.getElementById('inp-tdate').value;t.notes=document.getElementById('inp-tnotes').value;t.link={label:document.getElementById('inp-tlinklabel').value.trim(),url:document.getElementById('inp-tlinkurl').value.trim()};}
 closeAll();scheduleSave();render();
 }
 
@@ -994,6 +1192,16 @@ var r=new FileReader();
 r.onload=function(ev){try{state=JSON.parse(ev.target.result);ensureStateShape();scheduleSave();render();}catch(err){alert('Invalid JSON');}};
 r.readAsText(file);
 }
+
+
+document.getElementById('inp-uimg').addEventListener('input',function(){
+  var val=this.value.trim(),prev=document.getElementById('uimg-preview');
+  if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
+});
+document.getElementById('inp-ubg').addEventListener('input',function(){
+  var val=this.value.trim(),prev=document.getElementById('ubg-preview');
+  if(val){prev.src=val;prev.classList.add('show');}else{prev.classList.remove('show');}
+});
 
 /* ── BOOT ── */
 ensureStateShape();
