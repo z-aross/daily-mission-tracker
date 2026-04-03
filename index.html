@@ -386,6 +386,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 </div>
 
+
+<!-- Move uncategorised task modal -->
+<div class="overlay" id="m-moveuncat">
+<div class="modal">
+<h3>Move to project</h3>
+<div class="field">
+<label>Choose project</label>
+<select id="inp-move-project" style="width:100%;background:#111;border:0.5px solid #333;border-radius:8px;padding:8px 10px;color:#e8e8e8;font-size:13px;outline:none;font-family:inherit"></select>
+</div>
+<div class="modal-btns">
+<button class="btn" style="flex:1" onclick="closeAll()">Cancel</button>
+<button class="btn btn-g" style="flex:1" onclick="confirmMoveUncatTask()">Move</button>
+</div>
+</div>
+</div>
+
 <!-- Add/Edit habit modal -->
 <div class="overlay" id="m-habit">
 <div class="modal">
@@ -578,7 +594,7 @@ habits:[
 };
 
 /* ── HELPERS ── */
-var dragSrc=null,editProjId=null,editHabitId=null,editTaskRef=null,newProjPri=1,selColor=0,editUncatBoxKey=null;
+var dragSrc=null,editProjId=null,editHabitId=null,editTaskRef=null,newProjPri=1,selColor=0,editUncatBoxKey=null,moveUncatTaskId=null;
 
 function col(ci){return COLORS[(ci||0)%COLORS.length];}
 function pct(tasks){if(!tasks||!tasks.length)return 0;return Math.round(tasks.filter(function(t){return t.done;}).length/tasks.length*100);}
@@ -739,6 +755,34 @@ function confirmUncatBox(){
   closeAll(); scheduleSave(); render();
 }
 
+
+function openMoveUncatTask(tid){
+  moveUncatTaskId=tid;
+  var sel=document.getElementById('inp-move-project');
+  if(!sel) return;
+  var sorted=state.projects.slice().sort(function(a,b){return a.priority-b.priority;});
+  sel.innerHTML=sorted.map(function(p){
+    return '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>';
+  }).join('');
+  document.getElementById('m-moveuncat').classList.add('open');
+}
+function confirmMoveUncatTask(){
+  if(!moveUncatTaskId) return;
+  var tid=moveUncatTaskId;
+  var sel=document.getElementById('inp-move-project');
+  var pid=sel ? sel.value : '';
+  var taskIndex=(state.uncategorized||[]).findIndex(function(x){return x.id===tid;});
+  var project=state.projects.find(function(x){return x.id===pid;});
+  if(taskIndex<0 || !project){ closeAll(); return; }
+  var task=state.uncategorized.splice(taskIndex,1)[0];
+  project.tasks=project.tasks||[];
+  project.tasks.push(task);
+  moveUncatTaskId=null;
+  closeAll();
+  scheduleSave();
+  render();
+}
+
 function uncatSplit(){ return (state.uncategorized||[]).length>8; }
 function uncatGroups(){
   var arr=state.uncategorized||[];
@@ -749,7 +793,7 @@ function uncatGroups(){
 function renderUncatTask(t){
   var ds=dateStatus(t.date), sd=t.subtasks?t.subtasks.filter(function(s){return s.done;}).length:0, st=t.subtasks?t.subtasks.length:0;
   var linkHtml=(t.link&&t.link.url&&t.link.label)?'<div class="task-link-row"><a class="task-link-pill" href="'+esc(t.link.url)+'" target="_blank" rel="noopener"><span class="ico">&#128279;</span><span>'+esc(t.link.label)+'</span><span class="ext">&#8599;</span></a></div>':'';
-  var html='<div class="task-wrap" id="tw-'+t.id+'"><div class="task-item" id="ti-'+t.id+'" draggable="true" ondragstart="utds(event,\''+t.id+'\')" ondragend="tde()" ondragover="utdo(event,\''+t.id+'\')" ondrop="utdp(event,\''+t.id+'\')"><div class="drag-handle">&#8942;</div><div class="cb'+(t.done?' chk':'')+'" onclick="tickUncatTask(\''+t.id+'\')"></div><div class="task-body"><input class="task-txt'+(t.done?' dn':'')+'" value="'+esc(t.text)+'" onchange="editUncatTaskTxt(\''+t.id+'\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"><div class="task-meta">'+(t.date?'<span class="task-date-badge '+ds+'">'+fmtDate(t.date)+'</span>':'')+(st>0?'<span class="subtask-toggle" onclick="toggleUncatSubs(\''+t.id+'\')">'+sd+'/'+st+' subtasks</span>':'')+'</div>'+linkHtml+'</div><div class="task-edit-btns"><button class="te-btn" onclick="openUncatTaskDate(\''+t.id+'\')" title="Details">&#128197;</button><button class="te-btn" onclick="addUncatSubtask(\''+t.id+'\')" title="Subtask">&#43;</button><button class="te-btn" onclick="delUncatTask(\''+t.id+'\')" title="Delete" style="color:#e24b4a">&#215;</button></div></div>';
+  var html='<div class="task-wrap" id="tw-'+t.id+'"><div class="task-item" id="ti-'+t.id+'" draggable="true" ondragstart="utds(event,\''+t.id+'\')" ondragend="tde()" ondragover="utdo(event,\''+t.id+'\')" ondrop="utdp(event,\''+t.id+'\')"><div class="drag-handle">&#8942;</div><div class="cb'+(t.done?' chk':'')+'" onclick="tickUncatTask(\''+t.id+'\')"></div><div class="task-body"><input class="task-txt'+(t.done?' dn':'')+'" value="'+esc(t.text)+'" onchange="editUncatTaskTxt(\''+t.id+'\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"><div class="task-meta">'+(t.date?'<span class="task-date-badge '+ds+'">'+fmtDate(t.date)+'</span>':'')+(st>0?'<span class="subtask-toggle" onclick="toggleUncatSubs(\''+t.id+'\')">'+sd+'/'+st+' subtasks</span>':'')+'</div>'+linkHtml+'</div><div class="task-edit-btns"><button class="te-btn" onclick="openUncatTaskDate(\''+t.id+'\')" title="Details">&#128197;</button><button class="te-btn" onclick="openMoveUncatTask(\''+t.id+'\')" title="Move to project">&#10132;</button><button class="te-btn" onclick="addUncatSubtask(\''+t.id+'\')" title="Subtask">&#43;</button><button class="te-btn" onclick="delUncatTask(\''+t.id+'\')" title="Delete" style="color:#e24b4a">&#215;</button></div></div>';
   if(t.subtasks&&t.subtasks.length&&t.open){
     html+='<div class="subtasks">';
     t.subtasks.forEach(function(s){
@@ -1178,7 +1222,7 @@ else{state.habits.push({id:'hb'+Date.now(),name:name,iconImg:iconImg,bg:bg,days:
 closeAll();scheduleSave();render();
 }
 
-function closeAll(){document.querySelectorAll('.overlay').forEach(function(el){el.classList.remove('open');});}
+function closeAll(){document.querySelectorAll('.overlay').forEach(function(el){el.classList.remove('open');});moveUncatTaskId=null;}
 
 /* ── IMPORT / EXPORT ── */
 function doExport(){
